@@ -321,6 +321,7 @@ export default function Page() {
           </div>
         </div>
         <div className="actions">
+          <button onClick={() => window.open('/proficiency', '_blank')}>熟练度</button>
           <button onClick={() => window.open('/wrongbook', '_blank')}>错题本</button>
           <button onClick={() => setShowDonate(true)}>支持作者</button>
           <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>切换主题</button>
