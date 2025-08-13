@@ -314,7 +314,7 @@ export default function Page() {
           <div className="logo" aria-hidden="true" />
           <div>
             <h1>位号记忆练习</h1>
-            <p className="subtitle">Designed by Satori🍊. Powered by Vercel.</p>
+            <p className="subtitle">Designed by Satori🍊. Powered by Vercel.❤️</p>
           </div>
         </div>
         <div className="actions">

@@ -74,10 +74,16 @@ button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2
   position: absolute;
   right: 16px;
   bottom: 16px;
-  background: var(--panel);
-  border: 1px solid var(--border);
+  background: var(--success-border);
+  border: 1px solid transparent;
   border-radius: 10px;
   padding: 8px 12px;
   box-shadow: 0 2px 8px #00000014;
+  color: #fff;
+  font-weight: 600;
+  z-index: 2;
 }
+
+/* 为答题卡片预留底部空间，避免与右下角统计小块重叠 */
+#quiz { padding-bottom: 72px; }
 
