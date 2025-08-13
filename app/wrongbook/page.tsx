@@ -16,6 +16,21 @@ export default function WrongbookPage() {
   const [pf, setPf] = useState<Record<string, Perf>>({});
   const [std, setStd] = useState<Record<string, Std>>({});
 
+  // 跟随主页面的深浅色主题
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem('quiz-theme') || 'light';
+      document.body.classList.toggle('dark', saved === 'dark');
+      const onStorage = (e: StorageEvent) => {
+        if (e.key === 'quiz-theme') {
+          document.body.classList.toggle('dark', (e.newValue || 'light') === 'dark');
+        }
+      };
+      window.addEventListener('storage', onStorage);
+      return () => window.removeEventListener('storage', onStorage);
+    }
+  }, []);
+
   useEffect(() => {
     async function boot() {
       const parse = (text: string) => {
