@@ -82,7 +82,7 @@ export default function WrongbookPage() {
         else if (category === '工艺指标') name = std[tag]?.name || '';
         const wrong = Number(rec.wrong) || 0;
         return { category, tag, name, wrong, sev: severity(wrong) };
-      });
+      }).filter(it => it.wrong > 0); // 只保留确有错误的题目
       const order = { red:5, orange:4, yellow:3, green:2, blue:1 } as Record<string,number>;
       arr.sort((a,b) => (order[b.sev]-order[a.sev]) || (b.wrong - a.wrong) || a.category.localeCompare(b.category) || a.tag.localeCompare(b.tag));
       return arr;
