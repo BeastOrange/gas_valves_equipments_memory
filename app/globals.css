@@ -75,6 +75,22 @@ button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2
 .prof-table tbody tr:nth-child(odd) { background: #ffffff03; }
 .prof-table tbody tr:hover { background: #ffffff08; }
 
+/* Proficiency header stat cards */
+.stat-cards { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.stat-card { background: linear-gradient(180deg, #ffffff06, #00000005); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; box-shadow: 0 4px 14px #00000010; }
+.stat-title { font-size: 12px; color: var(--muted); }
+.stat-value { font-size: 18px; font-weight: 700; margin-top: 2px; }
+
+/* Level distribution bar */
+.level-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 14px; }
+.level-seg { height: 100%; }
+.level-seg.l0 { background: #3b82f6; }
+.level-seg.l1 { background: #ef4444; }
+.level-seg.l2 { background: #f59e0b; }
+.level-seg.l3 { background: #eab308; }
+.level-seg.l4 { background: #22c55e; }
+.level-seg.l5 { background: #16a34a; }
+
 /* 右下角统计小模块 */
 .stat-chip {
   position: absolute;

@@ -35,6 +35,17 @@ export default function ProficiencyPage() {
     return 'wb-blue';
   }
 
+  const stats = useMemo(() => {
+    const total = items.length;
+    const sumCorrect = items.reduce((s, x) => s + (Number(x.correct) || 0), 0);
+    const sumWrong = items.reduce((s, x) => s + (Number(x.wrong) || 0), 0);
+    const sumLevel = items.reduce((s, x) => s + (Number(x.level) || 0), 0);
+    const avgLevel = total ? (sumLevel / total) : 0;
+    const dist = Array.from({ length: 6 }, () => 0);
+    items.forEach(x => { const l = Math.max(0, Math.min(5, Number(x.level) || 0)); dist[l] += 1; });
+    return { total, sumCorrect, sumWrong, avgLevel, dist };
+  }, [items]);
+
   return (
     <div className="container">
       <div className="topbar">
@@ -43,6 +54,18 @@ export default function ProficiencyPage() {
       </div>
 
       <section className="panel">
+        <div className="stat-cards">
+          <div className="stat-card"><div className="stat-title">条目</div><div className="stat-value">{stats.total}</div></div>
+          <div className="stat-card"><div className="stat-title">正确</div><div className="stat-value">{stats.sumCorrect}</div></div>
+          <div className="stat-card"><div className="stat-title">错误</div><div className="stat-value">{stats.sumWrong}</div></div>
+          <div className="stat-card"><div className="stat-title">平均熟练度</div><div className="stat-value">{stats.avgLevel.toFixed(2)}</div></div>
+        </div>
+        <div className="level-bar" title="熟练度分布 0~5">
+          {stats.dist.map((n, i) => {
+            const pct = stats.total ? (n / stats.total * 100) : 0;
+            return <div key={i} className={`level-seg l${i}`} style={{ width: pct + '%' }} title={`Lv${i}: ${n}`} />
+          })}
+        </div>
         {items.length === 0 ? (
           <div style={{color:'var(--muted)'}}>暂无数据。</div>
         ) : (
