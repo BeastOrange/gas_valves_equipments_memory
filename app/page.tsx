@@ -256,10 +256,16 @@ export default function Page() {
     const form = document.getElementById('quizForm') as HTMLFormElement;
     const fd = new FormData(form);
     const get = (k: string) => String(fd.get(k) || '');
+    const clearInputs = () => {
+      if (!form) return;
+      const inputs = Array.from(form.querySelectorAll('input')) as HTMLInputElement[];
+      inputs.forEach(i => { i.value = ''; });
+    };
     if (shortcut === '1' || shortcut === '2') {
       const okNow = shortcut === '1';
       showAnswer(truth, okNow);
       setProf(c, t, okNow);
+      clearInputs();
       // 短暂停留 600ms 再进入下一题
       setTimeout(() => next(okNow), 600);
       return;
@@ -269,6 +275,7 @@ export default function Page() {
     Object.keys(truth).forEach(k => { if (k === 'name' || k === 'floor') return; okAll = okAll && isCorrect(get(k), (truth as any)[k], false); });
     showAnswer(truth, okAll);
     setProf(c, t, okAll);
+    clearInputs();
     setTimeout(() => next(okAll), 600);
   }
 
