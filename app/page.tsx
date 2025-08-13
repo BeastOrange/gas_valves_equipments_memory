@@ -175,11 +175,12 @@ export default function Page() {
   // 首次挂载：自动加载 public/data 下的三张 CSV
   useEffect(() => {
     async function boot() {
+      const ver = Date.now();
       try {
         const [eqRes, vaRes, pfRes] = await Promise.all([
-          fetch('/data/equipment.csv'),
-          fetch('/data/valves.csv'),
-          fetch('/data/performance.csv'),
+          fetch(`/data/equipment.csv?v=${ver}`, { cache: 'no-store' }),
+          fetch(`/data/valves.csv?v=${ver}`, { cache: 'no-store' }),
+          fetch(`/data/performance.csv?v=${ver}`, { cache: 'no-store' }),
         ]);
         const texts = await Promise.all([eqRes.text(), vaRes.text(), pfRes.text()]);
         const parse = (text: string) => {
@@ -208,16 +209,14 @@ export default function Page() {
         pfRows.forEach((r:any) => {
           const tag = canonicalTag(r.tag); const name = (r.name||'').trim(); if(!tag || !name) return;
           const p: Perf = { tag, name, medium:r.medium?.trim(), power_kw:r.power_kw?.trim(), head_m:r.head_m?.trim(), flow_m3h:r.flow_m3h?.trim(), speed_rpm:r.speed_rpm?.trim(), pressure_bar:r.pressure_bar?.trim(), diameter_m:r.diameter_m?.trim(), length_m:r.length_m?.trim(), volume_m3:r.volume_m3?.trim(), rated_current_a:r.rated_current_a?.trim() };
-          if (pfMap[tag]) {
-            const prev = pfMap[tag];
-            (Object.keys(p) as (keyof Perf)[]).forEach(k => { if(k==='tag'||k==='name') return; const nv=p[k]; const ov=(prev as any)[k]; if(!nv) return; if(!ov) (prev as any)[k]=nv; else if (!normalize(String(ov)).includes(normalize(String(nv)))) (prev as any)[k]=String(ov)+'/'+String(nv); });
-          } else { pfMap[tag] = p; }
+          // 覆盖为最新一条，保证按最新CSV为准
+          pfMap[tag] = pfMap[tag] ? { ...pfMap[tag], ...Object.fromEntries(Object.entries(p).filter(([,v]) => String(v||'').trim() !== '')) } as Perf : p;
         });
         setPf(pfMap);
 
         // 工艺指标 standard.csv
         try {
-          const stdRes = await fetch('/data/standard.csv');
+          const stdRes = await fetch(`/data/standard.csv?v=${ver}`, { cache: 'no-store' });
           if (stdRes.ok) {
             const stdTxt = await stdRes.text();
             const stdRows = parse(stdTxt);
@@ -248,7 +247,7 @@ export default function Page() {
     if (c === '设备') { const e = eq[t]; return e ? { name: e.name } : null; }
     if (c === '阀门') { const v = va[t]; if (!v) return null; const o: any = { name: v.name }; if (v.floor) o.floor = v.floor; return o; }
     if (c === '工艺指标') { const s = std[t]; if (!s) return null; const o: any = { name: s.name }; if (s.tag) o.tag = s.tag; if (s.control_tag) o.control_tag = s.control_tag; if (s.unit) o.unit = s.unit; if (s.standard) o.standard = s.standard; return o; }
-    const p = pf[t]; if (!p) return null; const o: any = {}; Object.keys(perfLabels).forEach(k => { const v = (p as any)[k]; if (v) o[k] = v; }); return o;
+    const p = pf[t]; if (!p) return null; const o: any = {}; Object.keys(perfLabels).forEach(k => { const v = (p as any)[k]; if (v !== undefined && v !== null && String(v).trim() !== '') o[k] = v; }); return o;
   }
 
   function submit(shortcut?: '1' | '2') {

@@ -40,6 +40,7 @@ export default function WrongbookPage() {
 
   useEffect(() => {
     async function boot() {
+      const ver = Date.now();
       const parse = (text: string) => {
         const lines = text.replace(/\r\n?/g, '\n').split('\n').filter(x => x.trim().length > 0);
         const headers = lines[0].split(',').map(h => h.trim());
@@ -53,10 +54,10 @@ export default function WrongbookPage() {
 
       try {
         const [eqRes, vaRes, pfRes, stdRes] = await Promise.all([
-          fetch('/data/equipment.csv'),
-          fetch('/data/valves.csv'),
-          fetch('/data/performance.csv'),
-          fetch('/data/standard.csv'),
+          fetch(`/data/equipment.csv?v=${ver}`, { cache: 'no-store' }),
+          fetch(`/data/valves.csv?v=${ver}`, { cache: 'no-store' }),
+          fetch(`/data/performance.csv?v=${ver}`, { cache: 'no-store' }),
+          fetch(`/data/standard.csv?v=${ver}`, { cache: 'no-store' }),
         ]);
         if (eqRes.ok) {
           const rows = parse(await eqRes.text()); const m: Record<string, Equip> = {};
@@ -70,9 +71,9 @@ export default function WrongbookPage() {
         }
         if (pfRes.ok) {
           const rows = parse(await pfRes.text()); const m: Record<string, Perf> = {};
-          rows.forEach((r:any)=>{ const t=canonicalTag(r.tag||''); const n=(r.name||'').trim(); if(!t||!n) return; m[t]={
+          rows.forEach((r:any)=>{ const t=canonicalTag(r.tag||''); const n=(r.name||'').trim(); if(!t||!n) return; const p:Perf={
             tag:t, name:n, medium:r.medium?.trim(), power_kw:r.power_kw?.trim(), head_m:r.head_m?.trim(), flow_m3h:r.flow_m3h?.trim(), speed_rpm:r.speed_rpm?.trim(), pressure_bar:r.pressure_bar?.trim(), diameter_m:r.diameter_m?.trim(), length_m:r.length_m?.trim(), volume_m3:r.volume_m3?.trim(), rated_current_a:r.rated_current_a?.trim()
-          }; });
+          }; m[t] = m[t] ? { ...m[t], ...Object.fromEntries(Object.entries(p).filter(([,v])=>String(v||'').trim()!=='') ) } as Perf : p; });
           setPf(m);
         }
         if (stdRes.ok) {
