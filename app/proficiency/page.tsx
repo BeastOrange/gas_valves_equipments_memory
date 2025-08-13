@@ -27,6 +27,14 @@ export default function ProficiencyPage() {
     } catch { return []; }
   }, [themeReady]);
 
+  function levelDotClass(level: number) {
+    if (level >= 4) return 'wb-green';
+    if (level === 3) return 'wb-yellow';
+    if (level === 2) return 'wb-orange';
+    if (level === 1) return 'wb-red';
+    return 'wb-blue';
+  }
+
   return (
     <div className="container">
       <div className="topbar">
@@ -38,7 +46,7 @@ export default function ProficiencyPage() {
         {items.length === 0 ? (
           <div style={{color:'var(--muted)'}}>暂无数据。</div>
         ) : (
-          <table style={{width:'100%', borderCollapse:'separate', borderSpacing:0}}>
+          <table className="prof-table" style={{width:'100%', borderCollapse:'separate', borderSpacing:0}}>
             <thead>
               <tr style={{textAlign:'left', color:'var(--muted)'}}>
                 <th style={{padding:'8px 6px'}}>类别|位号</th>
@@ -50,7 +58,10 @@ export default function ProficiencyPage() {
             <tbody>
               {items.map(it => (
                 <tr key={it.key}>
-                  <td style={{padding:'8px 6px', borderTop:'1px solid var(--border)'}}>{it.key}</td>
+                  <td style={{padding:'8px 6px', borderTop:'1px solid var(--border)'}}>
+                    <span className={`wb-dot ${levelDotClass(it.level)}`} />
+                    <span style={{marginLeft:8}}>{it.key}</span>
+                  </td>
                   <td style={{padding:'8px 6px', borderTop:'1px solid var(--border)'}}>{it.correct}</td>
                   <td style={{padding:'8px 6px', borderTop:'1px solid var(--border)'}}>{it.wrong}</td>
                   <td style={{padding:'8px 6px', borderTop:'1px solid var(--border)'}}>

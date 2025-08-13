@@ -69,6 +69,10 @@ button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2
 .wb-green { background: #22c55e; }
 .wb-blue { background: #3b82f6; }
 
+/* Proficiency table subtle zebra stripes and hover */
+.prof-table tbody tr:nth-child(odd) { background: #ffffff03; }
+.prof-table tbody tr:hover { background: #ffffff08; }
+
 /* 右下角统计小模块 */
 .stat-chip {
   position: absolute;
