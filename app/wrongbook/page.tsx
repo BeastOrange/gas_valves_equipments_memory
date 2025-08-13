@@ -125,7 +125,7 @@ export default function WrongbookPage() {
   }
 
   const perfLabels = {
-    name: '名称', medium: '介质', power_kw: '功率(kW)', head_m: '扬程(m)', flow_m3h: '流量(m3/h)', speed_rpm: '转速(rpm)', pressure_bar: '压力(bar)', diameter_m: '直径(m)', length_m: '长度(m)', volume_m3: '容积(m3)', rated_current_a: '额定电流(A)'
+    name: '名称', medium: '介质', power_kw: '功率(kW)', head_m: '扬程(m)', flow_m3h: '流量(m3/h)', speed_rpm: '转速(rpm)', pressure_bar: '最大压力(bar)', diameter_m: '直径(m)', length_m: '长度(m)', volume_m3: '容积(m3)', rated_current_a: '额定电流(A)'
   } as const;
   const stdLabels: Record<string,string> = { name:'设备名称及控制项目', tag:'设备位号', control_tag:'项目控制位号', unit:'单位', standard:'控制指标' };
 
