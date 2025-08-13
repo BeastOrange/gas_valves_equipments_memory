@@ -367,7 +367,7 @@ export default function Page() {
           <div id="progressfill" style={{ width: `${Math.round((idx)/Math.max(1,list.length)*100)}%` }} />
         </div>
           <div className="row">
-            <div id="progress" className="progress-text">{idx}/{list.length}</div>
+            <div id="progress" className="progress-text">{Math.min(idx + 1, Math.max(1, list.length))}/{list.length}</div>
             <div className="tagline">
               <span id="catbadge" className="badge">{cur?.[0] || '-'}</span>
               <span id="tag">位号：{cur?.[1] || '-'}</span>
@@ -413,12 +413,12 @@ export default function Page() {
           }, [cur])}
           <div className="row">
             <button type="submit">提交/下一题</button>
-            <div id="stat">正确：{correct}</div>
           </div>
         </form>
         {answer && (
           <pre id="answer" className={"answer" + (ok ? ' correct' : '')}>{answer}</pre>
         )}
+        <div className="stat-chip">正确：{correct}</div>
       </section>
       <script dangerouslySetInnerHTML={{__html:`document.addEventListener('keydown',e=>{if(e.key==='Enter'){const v=(document.querySelector('input[name=\'name\']') as HTMLInputElement)?.value?.trim(); if(v==='1'){document.querySelector('button[type=submit]')?.setAttribute('data-sc','1');} else if(v==='2'){document.querySelector('button[type=submit]')?.setAttribute('data-sc','2');}}});`}} />
     </div>
