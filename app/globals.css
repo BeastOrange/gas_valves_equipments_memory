@@ -85,5 +85,9 @@ button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2
 }
 
 /* 为答题卡片预留底部空间，避免与右下角统计小块重叠 */
-#quiz { padding-bottom: 72px; }
+#quiz { padding-bottom: 24px; }
+
+/* 提交行布局，让统计小块和按钮同一行排列在右侧 */
+.submit-bar { display: flex; justify-content: space-between; align-items: center; }
+.submit-bar .stat-chip { position: static; margin-left: auto; }
 

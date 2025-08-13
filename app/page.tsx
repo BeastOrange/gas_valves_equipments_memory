@@ -414,14 +414,14 @@ export default function Page() {
               </>
             );
           }, [cur])}
-          <div className="row">
+          <div className="row submit-bar">
             <button type="submit">提交/下一题</button>
+            <div className="stat-chip">正确：{correct}</div>
           </div>
         </form>
         {answer && (
           <pre id="answer" className={"answer" + (ok ? ' correct' : '')}>{answer}</pre>
         )}
-        <div className="stat-chip">正确：{correct}</div>
       </section>
       <script dangerouslySetInnerHTML={{__html:`document.addEventListener('keydown',e=>{if(e.key==='Enter'){const v=(document.querySelector('input[name=\'name\']') as HTMLInputElement)?.value?.trim(); if(v==='1'){document.querySelector('button[type=submit]')?.setAttribute('data-sc','1');} else if(v==='2'){document.querySelector('button[type=submit]')?.setAttribute('data-sc','2');}}});`}} />
     </div>
