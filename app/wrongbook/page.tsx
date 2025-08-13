@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 type Equip = { tag: string; name: string };
 type Valve = { tag: string; name: string; floor?: string };
-type Perf = { tag: string; name: string; medium?: string; power_kw?: string; head_m?: string; flow_m3h?: string; speed_rpm?: string; pressure_bar?: string; diameter_m?: string; length_m?: string; volume_m3?: string; rated_current_a?: string };
+type Perf = { tag: string; name: string; medium?: string; power_kw?: string; head_m?: string; flow_m3h?: string; speed_rpm?: string; pressure_bar?: string; diameter_m?: string; length_m?: string; volume_m3?: string; rated_current_a?: string; display_tag?: string };
 type Std = { control_tag: string; name: string; tag?: string; unit?: string; standard?: string };
 
 type ProfRec = { correct: number; wrong: number; level: number };
@@ -71,8 +71,8 @@ export default function WrongbookPage() {
         }
         if (pfRes.ok) {
           const rows = parse(await pfRes.text()); const m: Record<string, Perf> = {};
-          rows.forEach((r:any)=>{ const t=canonicalTag(r.tag||''); const n=(r.name||'').trim(); if(!t||!n) return; const p:Perf={
-            tag:t, name:n, medium:r.medium?.trim(), power_kw:r.power_kw?.trim(), head_m:r.head_m?.trim(), flow_m3h:r.flow_m3h?.trim(), speed_rpm:r.speed_rpm?.trim(), pressure_bar:r.pressure_bar?.trim(), diameter_m:r.diameter_m?.trim(), length_m:r.length_m?.trim(), volume_m3:r.volume_m3?.trim(), rated_current_a:r.rated_current_a?.trim()
+          rows.forEach((r:any)=>{ const orig=(r.tag||'').trim(); const t=canonicalTag(orig); const n=(r.name||'').trim(); if(!t||!n) return; const p:Perf={
+            tag:t, name:n, display_tag:orig, medium:r.medium?.trim(), power_kw:r.power_kw?.trim(), head_m:r.head_m?.trim(), flow_m3h:r.flow_m3h?.trim(), speed_rpm:r.speed_rpm?.trim(), pressure_bar:r.pressure_bar?.trim(), diameter_m:r.diameter_m?.trim(), length_m:r.length_m?.trim(), volume_m3:r.volume_m3?.trim(), rated_current_a:r.rated_current_a?.trim()
           }; m[t] = m[t] ? { ...m[t], ...Object.fromEntries(Object.entries(p).filter(([,v])=>String(v||'').trim()!=='') ) } as Perf : p; });
           setPf(m);
         }
@@ -149,7 +149,8 @@ export default function WrongbookPage() {
               const truth = opened ? buildTruth(it.category, it.tag) : null;
               const lines: string[] = [];
               if (truth) {
-                lines.push('位号：' + it.tag);
+                const disp = (it.category === '性能参数' && pf[it.tag]?.display_tag) ? pf[it.tag]?.display_tag : it.tag;
+                lines.push('位号：' + disp);
                 Object.entries(truth as Record<string,string>).forEach(([k,v]) => {
                   const label = (perfLabels as any)[k] || (stdLabels as any)[k] || k;
                   lines.push(`${label}：${v}`);

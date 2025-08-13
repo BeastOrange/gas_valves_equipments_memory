@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 type Equip = { tag: string; name: string };
 type Valve = { tag: string; name: string; floor?: string };
-type Perf = { tag: string; name: string; medium?: string; power_kw?: string; head_m?: string; flow_m3h?: string; speed_rpm?: string; pressure_bar?: string; diameter_m?: string; length_m?: string; volume_m3?: string; rated_current_a?: string };
+type Perf = { tag: string; name: string; medium?: string; power_kw?: string; head_m?: string; flow_m3h?: string; speed_rpm?: string; pressure_bar?: string; diameter_m?: string; length_m?: string; volume_m3?: string; rated_current_a?: string; display_tag?: string };
 type Std = { control_tag: string; name: string; tag?: string; unit?: string; standard?: string };
 
 const TAG_BASE_RE = /^([A-Z]+\d+)/;
@@ -207,8 +207,9 @@ export default function Page() {
         const pfRows = parse(texts[2]);
         const pfMap: Record<string, Perf> = {};
         pfRows.forEach((r:any) => {
-          const tag = canonicalTag(r.tag); const name = (r.name||'').trim(); if(!tag || !name) return;
-          const p: Perf = { tag, name, medium:r.medium?.trim(), power_kw:r.power_kw?.trim(), head_m:r.head_m?.trim(), flow_m3h:r.flow_m3h?.trim(), speed_rpm:r.speed_rpm?.trim(), pressure_bar:r.pressure_bar?.trim(), diameter_m:r.diameter_m?.trim(), length_m:r.length_m?.trim(), volume_m3:r.volume_m3?.trim(), rated_current_a:r.rated_current_a?.trim() };
+          const originalTag = (r.tag||'').trim();
+          const tag = canonicalTag(originalTag); const name = (r.name||'').trim(); if(!tag || !name) return;
+          const p: Perf = { tag, name, display_tag: originalTag, medium:r.medium?.trim(), power_kw:r.power_kw?.trim(), head_m:r.head_m?.trim(), flow_m3h:r.flow_m3h?.trim(), speed_rpm:r.speed_rpm?.trim(), pressure_bar:r.pressure_bar?.trim(), diameter_m:r.diameter_m?.trim(), length_m:r.length_m?.trim(), volume_m3:r.volume_m3?.trim(), rated_current_a:r.rated_current_a?.trim() };
           // 覆盖为最新一条，保证按最新CSV为准
           pfMap[tag] = pfMap[tag] ? { ...pfMap[tag], ...Object.fromEntries(Object.entries(p).filter(([,v]) => String(v||'').trim() !== '')) } as Perf : p;
         });
@@ -372,7 +373,7 @@ export default function Page() {
             <div id="progress" className="progress-text">{Math.min(idx + 1, Math.max(1, list.length))}/{list.length}</div>
             <div className="tagline">
               <span id="catbadge" className="badge">{cur?.[0] || '-'}</span>
-              <span id="tag">位号：{cur?.[1] || '-'}</span>
+              <span id="tag">位号：{(() => { if (!cur) return '-'; const [c,t] = cur; if (c==='性能参数' && pf[t]?.display_tag) return pf[t]?.display_tag; return t; })()}</span>
             </div>
             <div id="proficiency" className="dots" title="熟练度">
               {Array.from({ length: 5 }).map((_, i) => {
