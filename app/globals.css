@@ -17,6 +17,8 @@ input:hover, select:hover { background: #ffffff06; }
 button { height: 44px; padding: 10px 16px; background: var(--primary); color: #fff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 2px 8px #2563eb33; transition: transform .1s ease, box-shadow .2s ease, background .2s ease; }
 button:hover { background: var(--primary-hover); box-shadow: 0 4px 16px #2563eb3d; }
 button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2563eb2a; }
+.btn-warning { background: #f59e0b; color: #1f2937; box-shadow: 0 2px 8px #f59e0b33; }
+.btn-warning:hover { background: #d97706; }
 .hint { font-size: 12px; color: var(--muted); }
 .answer { position: relative; background: var(--answer-bg); border: 1px dashed var(--answer-border); color: var(--answer-fg); padding: 12px 12px 12px 16px; white-space: pre-wrap; border-radius: 10px; }
 .answer.correct { background: var(--success-bg); border-color: var(--success-border); color: var(--success-fg); }
@@ -94,4 +96,5 @@ button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2
 /* 提交行布局，让统计小块和按钮同一行排列在右侧 */
 .submit-bar { display: flex; justify-content: space-between; align-items: center; }
 .submit-bar .stat-chip { position: static; margin-left: auto; }
+.submit-bar button + button { margin-left: 10px; }
 

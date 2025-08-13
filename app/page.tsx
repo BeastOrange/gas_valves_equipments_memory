@@ -310,6 +310,14 @@ export default function Page() {
     setTimeout(() => nameRef.current?.focus(), 50);
   }
 
+  function viewAnswer() {
+    if (!cur) return;
+    const [c, t] = cur;
+    const truth = buildTruth(c, t);
+    if (!truth) return;
+    showAnswer(truth as any, false);
+  }
+
   return (
     <div className="container">
       <div className="topbar">
@@ -417,6 +425,7 @@ export default function Page() {
           }, [cur])}
           <div className="row submit-bar">
             <button type="submit">提交/下一题</button>
+            <button type="button" className="btn-warning" onClick={viewAnswer}>查看答案</button>
             <div className="stat-chip">正确：{correct}</div>
           </div>
         </form>
