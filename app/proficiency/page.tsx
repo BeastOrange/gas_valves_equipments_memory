@@ -46,6 +46,20 @@ export default function ProficiencyPage() {
     return { total, sumCorrect, sumWrong, avgLevel, dist };
   }, [items]);
 
+  // 各题型平均正确率统计
+  const catStats = useMemo(() => {
+    const map: Record<string, { correct: number; total: number }> = {};
+    items.forEach((it) => {
+      const category = (it.key.split('|')[0] || '未知');
+      const c = Number(it.correct) || 0;
+      const w = Number(it.wrong) || 0;
+      if (!map[category]) map[category] = { correct: 0, total: 0 };
+      map[category].correct += c;
+      map[category].total += c + w;
+    });
+    return map;
+  }, [items]);
+
   return (
     <div className="container">
       <div className="topbar">
@@ -59,6 +73,20 @@ export default function ProficiencyPage() {
           <div className="stat-card"><div className="stat-title">正确</div><div className="stat-value">{stats.sumCorrect}</div></div>
           <div className="stat-card"><div className="stat-title">错误</div><div className="stat-value">{stats.sumWrong}</div></div>
           <div className="stat-card"><div className="stat-title">平均熟练度</div><div className="stat-value">{stats.avgLevel.toFixed(2)}</div></div>
+        </div>
+        {/* 各题型平均正确率 */}
+        <div className="acc-cards">
+          {['设备','阀门','性能参数','工艺指标'].map(key => {
+            const s = catStats[key] || { correct: 0, total: 0 };
+            const rate = s.total ? Math.round(s.correct / s.total * 100) : 0;
+            return (
+              <div key={key} className="acc-card">
+                <div className="acc-title">{key} 平均正确率</div>
+                <div className="acc-value">{rate}%</div>
+                <div className="acc-bar"><div style={{ width: rate + '%' }} /></div>
+              </div>
+            );
+          })}
         </div>
         <div className="level-bar" title="熟练度分布 0~5">
           {stats.dist.map((n, i) => {

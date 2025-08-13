@@ -91,6 +91,14 @@ button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2
 .level-seg.l4 { background: #22c55e; }
 .level-seg.l5 { background: #16a34a; }
 
+/* 分类平均正确率卡片 */
+.acc-cards { display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.acc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+.acc-title { font-size: 12px; color: var(--muted); }
+.acc-value { font-size: 18px; font-weight: 700; margin: 4px 0; }
+.acc-bar { height: 8px; border-radius: 999px; background: #00000015; overflow: hidden; border: 1px solid var(--border); }
+.acc-bar > div { height: 100%; background: linear-gradient(90deg, #22c55e, #3b82f6); }
+
 /* 右下角统计小模块 */
 .stat-chip {
   position: absolute;
