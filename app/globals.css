@@ -61,3 +61,11 @@ button:active { transform: translateY(1px) scale(0.99); box-shadow: 0 1px 6px #2
 /* 让“开始”按钮固定在卡片右侧且在卡片内 */
 .panel-actions { display: flex; justify-content: flex-end; }
 
+/* 错题本严重程度小圆点 */
+.wb-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dot-gray); }
+.wb-red { background: #ef4444; }
+.wb-orange { background: #f59e0b; }
+.wb-yellow { background: #eab308; }
+.wb-green { background: #22c55e; }
+.wb-blue { background: #3b82f6; }
+
