@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 type Equip = { tag: string; name: string };
 type Valve = { tag: string; name: string; floor?: string };
 type Perf = { tag: string; name: string; medium?: string; power_kw?: string; head_m?: string; flow_m3h?: string; speed_rpm?: string; pressure_bar?: string; diameter_m?: string; length_m?: string; volume_m3?: string; rated_current_a?: string };
+type Std = { control_tag: string; name: string; tag?: string; unit?: string; standard?: string };
 
 const TAG_BASE_RE = /^([A-Z]+\d+)/;
 const normalize = (t?: string) => {
@@ -34,6 +35,7 @@ export default function Page() {
   const [eq, setEq] = useState<Record<string, Equip>>({});
   const [va, setVa] = useState<Record<string, Valve>>({});
   const [pf, setPf] = useState<Record<string, Perf>>({});
+  const [std, setStd] = useState<Record<string, Std>>({}); // 工艺指标
   const [list, setList] = useState<[string, string][]>([]);
   const [idx, setIdx] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -63,6 +65,13 @@ export default function Page() {
   const perfLabels = {
     name: '名称', medium: '介质', power_kw: '功率(kW)', head_m: '扬程(m)', flow_m3h: '流量(m3/h)', speed_rpm: '转速(rpm)', pressure_bar: '压力(bar)', diameter_m: '直径(m)', length_m: '长度(m)', volume_m3: '容积(m3)', rated_current_a: '额定电流(A)'
   } as const;
+  const stdLabels: Record<string,string> = {
+    name: '设备名称及控制项目',
+    tag: '设备位号',
+    control_tag: '项目控制位号',
+    unit: '单位',
+    standard: '控制指标',
+  };
 
   const cur = useMemo(() => list[idx] || null, [list, idx]);
 
@@ -102,6 +111,7 @@ export default function Page() {
   function setPerfFields(c: string, t: string) {
     if (c === '设备') return ['name'];
     if (c === '阀门') return va[t]?.floor ? ['name','floor'] : ['name'];
+    if (c === '工艺指标') return ['name','tag','control_tag','unit','standard'].filter(k => (std[t] as any)?.[k]);
     const p = pf[t];
     const cand = ['name','medium','power_kw','head_m','flow_m3h','speed_rpm','pressure_bar','diameter_m','length_m','volume_m3','rated_current_a'] as const;
     return cand.filter(k => (p as any)?.[k]);
@@ -131,22 +141,26 @@ export default function Page() {
     const eqItems = Object.keys(eq).map(t => ['设备', t] as [string,string]);
     const vaItems = Object.keys(va).map(t => ['阀门', t] as [string,string]);
     const pfItems = Object.keys(pf).map(t => ['性能参数', t] as [string,string]);
+    const stdItems = Object.keys(std).map(t => ['工艺指标', t] as [string,string]);
 
     if (exam) {
       const R = 0.33; // 固定占比 33%
       if (category === '设备') items.push(...sampleByRatio(eqItems, R));
       else if (category === '阀门') items.push(...sampleByRatio(vaItems, R));
       else if (category === '性能参数') items.push(...sampleByRatio(pfItems, R));
+      else if (category === '工艺指标') items.push(...sampleByRatio(stdItems, R));
       else {
         items.push(...sampleByRatio(eqItems, R));
         items.push(...sampleByRatio(vaItems, R));
         items.push(...sampleByRatio(pfItems, R));
+        items.push(...sampleByRatio(stdItems, R));
       }
     } else {
       if (category === '设备') items.push(...eqItems);
       else if (category === '阀门') items.push(...vaItems);
       else if (category === '性能参数') items.push(...pfItems);
-      else { items.push(...eqItems, ...vaItems, ...pfItems); }
+      else if (category === '工艺指标') items.push(...stdItems);
+      else { items.push(...eqItems, ...vaItems, ...pfItems, ...stdItems); }
     }
     if (items.length === 0) { alert('请先导入 CSV 数据'); return; }
     items.sort(() => Math.random() - 0.5);
@@ -198,6 +212,28 @@ export default function Page() {
           } else { pfMap[tag] = p; }
         });
         setPf(pfMap);
+
+        // 工艺指标 standard.csv
+        try {
+          const stdRes = await fetch('/data/standard.csv');
+          if (stdRes.ok) {
+            const stdTxt = await stdRes.text();
+            const stdRows = parse(stdTxt);
+            const stdMap: Record<string, Std> = {};
+            stdRows.forEach((r:any) => {
+              const key = (r.control_tag || '').trim();
+              if (!key) return;
+              stdMap[key] = {
+                control_tag: key,
+                name: (r.name||'').trim(),
+                tag: (r.tag||'').trim(),
+                unit: (r.unit||'').trim(),
+                standard: (r.standard||'').trim(),
+              };
+            });
+            setStd(stdMap);
+          }
+        } catch {}
       } catch (e) {
         // 忽略加载失败
       }
@@ -208,6 +244,7 @@ export default function Page() {
   function buildTruth(c: string, t: string) {
     if (c === '设备') { const e = eq[t]; return e ? { name: e.name } : null; }
     if (c === '阀门') { const v = va[t]; if (!v) return null; const o: any = { name: v.name }; if (v.floor) o.floor = v.floor; return o; }
+    if (c === '工艺指标') { const s = std[t]; if (!s) return null; const o: any = { name: s.name }; if (s.tag) o.tag = s.tag; if (s.control_tag) o.control_tag = s.control_tag; if (s.unit) o.unit = s.unit; if (s.standard) o.standard = s.standard; return o; }
     const p = pf[t]; if (!p) return null; const o: any = {}; Object.keys(perfLabels).forEach(k => { const v = (p as any)[k]; if (v) o[k] = v; }); return o;
   }
 
@@ -287,6 +324,7 @@ export default function Page() {
               <option>设备</option>
               <option>阀门</option>
               <option>性能参数</option>
+              <option>工艺指标</option>
               <option>混合</option>
             </select>
           </div>
@@ -337,7 +375,9 @@ export default function Page() {
 
         <form id="quizForm" onSubmit={(e) => { e.preventDefault(); submit(); }}>
           <div className="row">
-            <label>名称</label>
+            <label>
+              {(cur?.[0] === '工艺指标') ? stdLabels['name'] : '名称'}
+            </label>
             <input name="name" ref={nameRef} onKeyDown={onNameKeyDown} />
           </div>
           {useMemo(() => {
@@ -355,7 +395,7 @@ export default function Page() {
                 <div id="perf-fields" className="perf field-grid">
                   {f.filter(k => k !== 'name' && k !== 'floor').map(k => (
                     <div className="row" key={k}>
-                      <label>{(perfLabels as any)[k] || k}</label>
+                      <label>{cur?.[0] === '工艺指标' ? (stdLabels as any)[k] || k : (perfLabels as any)[k] || k}</label>
                       <input name={k} />
                     </div>
                   ))}
