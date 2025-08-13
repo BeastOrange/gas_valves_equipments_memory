@@ -45,6 +45,7 @@ export default function Page() {
   const [exam, setExam] = useState(false);
   const [showDonate, setShowDonate] = useState(false);
   const [profTick, setProfTick] = useState(0); // 用于触发重渲染
+  const [dataLoaded, setDataLoaded] = useState(false); // 数据是否加载完成
 
   useEffect(() => {
     // 仅在客户端访问 localStorage，避免 SSR 报错
@@ -162,7 +163,8 @@ export default function Page() {
       else if (category === '工艺指标') items.push(...stdItems);
       else { items.push(...eqItems, ...vaItems, ...pfItems, ...stdItems); }
     }
-    if (items.length === 0) { alert('请先导入 CSV 数据'); return; }
+    // 若数据尚未就绪或无可用题目，静默返回，不弹窗
+    if (items.length === 0) { return; }
     items.sort(() => Math.random() - 0.5);
     const lim = parseInt(limit || '0', 10);
     setList(Number.isFinite(lim) && lim > 0 ? items.slice(0, lim) : items);
@@ -237,6 +239,7 @@ export default function Page() {
       } catch (e) {
         // 忽略加载失败
       }
+      setDataLoaded(true);
     }
     boot();
   }, []);
@@ -345,7 +348,7 @@ export default function Page() {
           </div>
         </div>
         <div className="panel-actions">
-          <button onClick={start}>开始</button>
+          <button onClick={start} disabled={!dataLoaded} title={!dataLoaded ? '数据加载中...' : undefined}>开始</button>
         </div>
 
         {/* 已移除导入 CSV 区（默认从 /public/data 自动加载） */}
